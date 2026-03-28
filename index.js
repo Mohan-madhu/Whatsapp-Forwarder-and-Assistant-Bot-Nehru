@@ -655,6 +655,7 @@ loadSessions();
 function handleForwarderCommand(message, messageBody) {
   const command = messageBody.toUpperCase().trim();
   const chatId = message.from;
+  const isSelfChatCommand = message.fromMe && message.to && message.to === message.from;
 
   // WB-TAG: Tag current message for forwarding
   if (command === 'WB-TAG' || command.startsWith('WB-TAG ')) {
@@ -664,7 +665,7 @@ function handleForwarderCommand(message, messageBody) {
     if (message.hasQuotedMsg) {
       message.getQuotedMessage().then((quotedMsg) => {
         try {
-          if (quotedMsg.fromMe) {
+          if (quotedMsg.fromMe && !isSelfChatCommand) {
             enqueueMessage(chatId,
               '❌ Please reply to a user message to tag it (not a bot menu).');
             return;
