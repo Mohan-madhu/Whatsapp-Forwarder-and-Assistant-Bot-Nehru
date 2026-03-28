@@ -833,11 +833,6 @@ client.on('message', async (message) => {
     const trimmed = incoming.trim();
     const forwarderMatch = /^\s*WB-(TAG|FORWARD|STATUS)\b/i.test(incoming);
     if (forwarderMatch) {
-      const isSelfChatMessage = message.fromMe === true && message.to === message.from;
-      if (!isSelfChatMessage) {
-        logLine(`IGNORED WB command from non-admin chat=${chatId}`);
-        return;
-      }
       const handled = handleForwarderCommand(message, incoming);
       if (handled) return;
     }
