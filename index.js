@@ -779,16 +779,40 @@ client.on('ready', () => {
 });
 
 client.on('message_create', (message) => {
-  if (message.fromMe && message.id?._serialized) {
+  if (!message.fromMe) return;
+
+  const isSelfChat = message.to && message.to === message.from;
+  const body = typeof message.body === 'string' ? message.body : '';
+  const isForwarderCommand = /^\s*WB-(TAG|FORWARD|STATUS)\b/i.test(body);
+
+  // Handle admin forwarding commands directly from self-chat outgoing messages.
+  if (isSelfChat && isForwarderCommand) {
+    try {
+      handleForwarderCommand(message, body);
+    } catch (error) {
+      console.error('Error handling self-chat forwarder command:', error);
+    }
+  }
+
+  // Mark all outgoing messages so the 'message' listener can ignore duplicates.
+  if (message.id?._serialized) {
     sentMessageIds.add(message.id._serialized);
   }
 });
 
 client.on('message', async (message) => {
   try {
-    if (message.from === 'status@broadcast' || message.to === 'status@broadcast') return; // ignore status channel
-    if (message.from.includes('@g.us')) return; // ignore groups
-    if (message.fromMe && message.to && message.to !== message.from) return; // ignore outbound messages to others
+    const fromId = String(message.from || '');
+    const toId = String(message.to || '');
+    const isSelfChat = message.fromMe && toId && toId === fromId;
+
+    // Ignore status/broadcast traffic completely.
+    if (fromId === 'status@broadcast' || toId === 'status@broadcast') return;
+    if (fromId.endsWith('@broadcast') || toId.endsWith('@broadcast')) return;
+    if (message.isStatus === true || message.broadcast === true) return;
+
+    if (fromId.includes('@g.us')) return; // ignore groups
+    if (message.fromMe && !isSelfChat) return; // only allow self-chat from your own messages
     if (message.id?._serialized && sentMessageIds.has(message.id._serialized)) {
       sentMessageIds.delete(message.id._serialized);
       return;
@@ -796,14 +820,24 @@ client.on('message', async (message) => {
     if (message.fromMe && CONFIG.ALLOW_SELF_CHAT !== 1) return;
     const chatId = message.from;
     if (forwarder.isRecentlyForwarded(chatId)) return;
+    const messageType = String(message.type || '').toLowerCase();
+    if (messageType !== 'chat') {
+      logLine(`IGNORED non-text from=${chatId} type=${messageType || 'unknown'}`);
+      return;
+    }
     const session = getSession(chatId);
-    let incoming = message.body || '';
+    let incoming = typeof message.body === 'string' ? message.body : '';
     logLine(`IN from=${chatId} fromMe=${message.fromMe} body=${JSON.stringify(incoming)}`);
     
     // Handle forwarder commands first (WB-TAG, WB-FORWARD, etc.)
     const trimmed = incoming.trim();
     const forwarderMatch = /^\s*WB-(TAG|FORWARD|STATUS)\b/i.test(incoming);
     if (forwarderMatch) {
+      const isSelfChatMessage = message.fromMe === true && message.to === message.from;
+      if (!isSelfChatMessage) {
+        logLine(`IGNORED WB command from non-admin chat=${chatId}`);
+        return;
+      }
       const handled = handleForwarderCommand(message, incoming);
       if (handled) return;
     }
