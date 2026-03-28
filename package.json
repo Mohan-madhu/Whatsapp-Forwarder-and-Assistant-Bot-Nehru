@@ -1,0 +1,15 @@
+{
+  "name": "nasc-whatsapp-web-bot",
+  "version": "1.0.0",
+  "description": "NASC WhatsApp Admission Bot using whatsapp-web.js and JSON storage",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.26.0"
+  }
+}

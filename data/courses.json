@@ -1,0 +1,92 @@
+{
+  "ug": {
+    "computational": {
+      "1": {
+        "name": "B.Sc Computer Science",
+        "details": "💻 B.Sc COMPUTER SCIENCE\n\n📖 About the Course:\nComprehensive program covering programming, software development, databases, networks, and emerging technologies.\n\n🎯 Duration: 3 Years (6 Semesters)\n\n📋 Eligibility:\n- 12th Pass with Mathematics\n- Minimum 50% marks\n\n💼 Career Opportunities:\n✅ Software Developer\n✅ System Analyst\n✅ Database Administrator\n✅ Web Developer\n✅ IT Consultant\n✅ Cloud Engineer\n\n🏢 Top Recruiters:\nTCS, Infosys, Wipro, Cognizant, Accenture\n\n💰 Starting Salary: 3-10 LPA\n\nWant to know:\nA. Curriculum Details\nB. Lab Facilities\nC. Placement Statistics\nD. Apply Now\nE. Back to Courses\n\nReply: A, B, C, D, or E"
+      },
+      "2": {"name": "Bachelor of Computer Applications (BCA)"},
+      "3": {"name": "B.Sc Artificial Intelligence & Machine Learning"},
+      "4": {"name": "B.Sc Information Technology"},
+      "5": {"name": "B.Sc Computer Science with Data Science"},
+      "6": {"name": "B.Sc Internet of Things (IoT)"},
+      "7": {"name": "BCA with Business Analytics"}
+    },
+    "commerce": {
+      "1": {
+        "name": "B.Com (Accounting and Finance)",
+        "details": "📊 B.COM (ACCOUNTING AND FINANCE)\n\n📖 About the Course:\nSpecialized program in financial accounting, corporate finance, taxation, and business analytics.\n\n🎯 Duration: 3 Years (6 Semesters)\n\n📋 Eligibility:\n- 12th Pass (Any Stream)\n- Minimum 50% marks\n\n💼 Career Opportunities:\n✅ Accountant\n✅ Financial Analyst\n✅ Tax Consultant\n✅ Auditor\n✅ Banking Officer\n✅ Investment Advisor\n\n📚 Professional Courses:\nCan pursue CA, CMA, CS simultaneously\n\n🏢 Work Opportunities:\nBanks, MNCs, Audit Firms, Financial Institutions\n\n💰 Starting Salary: 2.5-6 LPA\n\nWant to know:\nA. Curriculum Details\nB. CA Coaching Support\nC. Internship Opportunities\nD. Apply Now\nE. Back to Courses\n\nReply: A, B, C, D, or E"
+      },
+      "2": {"name": "B.Com (Computer Applications)"},
+      "3": {"name": "B.Com (Professional Accounting)"},
+      "4": {"name": "B.Com (Information Technology)"},
+      "5": {"name": "B.Com Banking"}
+    },
+    "management": {
+      "1": {"name": "BBA (Computer Applications)"},
+      "2": {"name": "BBA (International Business)"},
+      "3": {"name": "BBA (Logistics)"},
+      "4": {
+        "name": "BBA (Aviation Management)",
+        "details": "✈️ BBA (AVIATION MANAGEMENT)\n\n📖 About the Course:\nSpecialized program in airline operations, airport management, and aviation industry practices.\n\n🎯 Duration: 3 Years (6 Semesters)\n\n📋 Eligibility:\n- 12th Pass (Any Stream)\n- Minimum 50% marks\n- Good communication skills\n\n💼 Career Opportunities:\n✅ Airport Manager\n✅ Airline Operations Executive\n✅ Ground Staff Manager\n✅ Cargo Management\n✅ Aviation Consultant\n✅ Travel & Tourism Manager\n\n🌍 Industry Exposure:\n✅ Airport Visits\n✅ Airline Internships\n✅ Guest Lectures by Industry Experts\n\n🏢 Career Options:\nAirlines, Airports, Travel Agencies, Cargo Companies\n\n💰 Starting Salary: 3-7 LPA\n\nWant to know:\nA. Curriculum Details\nB. Industry Partnerships\nC. Placement Support\nD. Apply Now\nE. Back to Courses\n\nReply: A, B, C, D, or E"
+      }
+    },
+    "life": {
+      "1": {"name": "B.Sc Biotechnology"},
+      "2": {"name": "B.Sc Microbiology"},
+      "3": {
+        "name": "B.Sc Food Science and Nutrition",
+        "details": "🍎 B.Sc FOOD SCIENCE AND NUTRITION\n\n📖 About the Course:\nComprehensive program covering food technology, nutrition science, diet planning, and food safety.\n\n🎯 Duration: 3 Years (6 Semesters)\n\n📋 Eligibility:\n- 12th Pass with Biology/Chemistry\n- Minimum 50% marks\n\n💼 Career Opportunities:\n✅ Nutritionist / Dietitian\n✅ Food Technologist\n✅ Quality Control Manager\n✅ Product Development\n✅ Clinical Nutritionist\n✅ Health Consultant\n\n🏥 Work Settings:\nHospitals, Food Companies, Research Labs, Schools, Hotels\n\n🔬 Lab Facilities:\nModern food testing and nutrition labs\n\n💰 Starting Salary: 2.5-5 LPA\n\nWant to know:\nA. Curriculum Details\nB. Lab & Practical Training\nC. Internship Opportunities\nD. Apply Now\nE. Back to Courses\n\nReply: A, B, C, D, or E"
+      }
+    },
+    "investigative": {
+      "1": {
+        "name": "B.Sc Digital and Cyber Forensic Science",
+        "details": "🔐 B.Sc DIGITAL AND CYBER FORENSIC SCIENCE\n\n📖 About the Course:\nCutting-edge program in cyber crime investigation, digital evidence analysis, and cyber security.\n\n🎯 Duration: 3 Years (6 Semesters)\n\n📋 Eligibility:\n- 12th Pass with Science/Maths\n- Minimum 50% marks\n\n💼 Career Opportunities:\n✅ Cyber Crime Investigator\n✅ Digital Forensic Analyst\n✅ Cyber Security Expert\n✅ Information Security Officer\n✅ Network Security Analyst\n✅ Incident Response Specialist\n\n🏢 Job Sectors:\nPolice Department, CBI, Intelligence Agencies, IT Companies, Banks\n\n🌟 Growing Demand:\nCyber crime is increasing - High job opportunities!\n\n💰 Starting Salary: 3-8 LPA\n\nWant to know:\nA. Curriculum Details\nB. Lab & Tools Training\nC. Government Job Opportunities\nD. Apply Now\nE. Back to Courses\n\nReply: A, B, C, D, or E"
+      },
+      "2": {"name": "B.A Criminology"},
+      "3": {"name": "B.Sc Forensic Science"},
+      "4": {"name": "B.Sc Psychology"}
+    },
+    "creative": {
+      "1": {"name": "B.Sc Catering Science and Hotel Management"},
+      "2": {"name": "B.Sc Costume Design and Fashion"},
+      "3": {
+        "name": "B.Sc Visual Communication (Electronic Media)",
+        "details": "📹 B.Sc VISUAL COMMUNICATION (ELECTRONIC MEDIA)\n\n📖 About the Course:\nCreative program covering photography, videography, editing, journalism, and media production.\n\n🎯 Duration: 3 Years (6 Semesters)\n\n📋 Eligibility:\n- 12th Pass (Any Stream)\n- Creative mindset preferred\n\n💼 Career Opportunities:\n✅ Photographer\n✅ Videographer\n✅ Video Editor\n✅ Content Creator\n✅ Journalist\n✅ Social Media Manager\n✅ Documentary Maker\n✅ News Anchor\n\n🎬 Facilities:\n✅ Photography Studio\n✅ Video Editing Labs\n✅ Professional Cameras\n✅ Sound Recording Studio\n\n🏢 Work Opportunities:\nTV Channels, Production Houses, Ad Agencies, Media Companies\n\n💰 Starting Salary: 2-6 LPA (Freelance opportunities high)\n\nWant to know:\nA. Curriculum Details\nB. Studio Facilities\nC. Portfolio Building\nD. Apply Now\nE. Back to Courses\n\nReply: A, B, C, D, or E"
+      }
+    },
+    "liberal": {
+      "1": {"name": "B.A English"}
+    }
+  },
+  "pg": {
+    "1": {"name": "Master of Social Work (MSW)"},
+    "2": {"name": "M.Sc Biotechnology"},
+    "3": {"name": "M.Sc Microbiology"},
+    "4": {"name": "M.Com (Finance and Control)"},
+    "5": {"name": "M.Sc Food Science and Nutrition"},
+    "6": {
+      "name": "M.Sc Data Science",
+      "details": "📊 M.Sc DATA SCIENCE\n\n📖 About the Course:\nAdvanced program in data analytics, machine learning, big data, AI, and statistical modeling.\n\n🎯 Duration: 2 Years (4 Semesters)\n\n📋 Eligibility:\n- Bachelor's in CS/IT/Maths/Statistics\n- Minimum 50% marks\n\n💼 Career Opportunities:\n✅ Data Scientist\n✅ Data Analyst\n✅ Machine Learning Engineer\n✅ Business Intelligence Analyst\n✅ AI Engineer\n✅ Research Scientist\n\n💰 High Paying Career:\nStarting Salary: 6-15 LPA\n\n🔥 Industry Demand: VERY HIGH!\n\n🏢 Top Recruiters:\nAmazon, Google, Microsoft, TCS, Accenture\n\n🎯 Skills You'll Master:\nPython, R, SQL, Tableau, Machine Learning, Deep Learning, NLP\n\nWant to know:\nA. Curriculum Details\nB. Research Opportunities\nC. Placement Support\nD. Apply Now\nE. Back to Courses\n\nReply: A, B, C, D, or E"
+    },
+    "7": {"name": "M.A Criminology"},
+    "8": {"name": "M.Sc Forensic Science"}
+  },
+  "phd": {
+    "1": {"name": "Ph.D. in Biotechnology"},
+    "2": {"name": "Ph.D. in Commerce"},
+    "3": {"name": "Ph.D. in Microbiology"},
+    "4": {"name": "Ph.D. in Computer Science"},
+    "5": {"name": "Ph.D. in Tamil"},
+    "6": {"name": "Ph.D. in English"},
+    "7": {"name": "Ph.D. in Hindi"},
+    "8": {"name": "Ph.D. in Management"},
+    "9": {"name": "Ph.D. in Electronics"},
+    "10": {"name": "Ph.D. in Master of Social Work"},
+    "11": {"name": "Ph.D. in Food Science and Nutrition"},
+    "12": {"name": "Ph.D. in Visual Communication"},
+    "13": {"name": "Ph.D. in Costume Design and Fashion (CDF)"}
+  },
+  "fallbackDetail": "📌 For full course details, curriculum, and fee structure, please contact our Admission Office: +91 887 000 5337 or email nascoffice@nehrucolleges.com.\n\nType E to go back or MENU for Main Menu"
+}
