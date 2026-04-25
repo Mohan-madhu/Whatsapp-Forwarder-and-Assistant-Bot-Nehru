@@ -1,0 +1,392 @@
+const express = require('express');
+const router = express.Router();
+const { pool, poolConnect, sql } = require('../../config/db_dearbasket');
+
+// GET all DailyMilkStatus
+router.get('/', async (req, res, next) => {
+  try {
+    await poolConnect;
+    const result = await pool.request()
+      .query('SELECT * FROM tbl_dailymilkstatus;');
+    res.json({ Response: result.recordset });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET dates for a booking
+router.get('/Dates/:id', async (req, res, next) => {
+  try {
+    await poolConnect;
+    const result = await pool.request()
+      .input('transid', sql.VarChar, req.params.id)
+      .query(`
+       	select * from fn_daily_milk_status_with_grocery()  
+        WHERE dailymilkbookingid = @transid order by date;
+      `);
+    res.json({ Response: result.recordset });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/Dates_old/:id', async (req, res, next) => {
+  try {
+    await poolConnect;
+    const result = await pool.request()
+      .input('transid', sql.VarChar, req.params.id)
+      .query(`
+        SELECT 
+          [date],
+          quantity,
+          cancelled,
+          extra,
+          amount,
+          received,
+          receivedtime,
+          cans_returned
+        FROM tbl_dailymilkstatus 
+        WHERE dailymilkbookingid = @transid;
+      `);
+    res.json({ Response: result.recordset });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/DailyMilkAccountsDashboard', async (req, res, next) => {
+  try {
+    await poolConnect;
+    const result = await pool.request()
+      .query('select * from fn_dailymilkaccountsdashboard()');
+    res.json({ Response: result.recordset });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/Dashboard', async (req, res, next) => {
+  try {
+    await poolConnect;
+
+    let { from, to } = req.query;
+
+    // Default → today if not provided
+    const today = new Date().toISOString().split("T")[0];
+
+    if (!from) from = today;
+    if (!to) to = today;
+
+    const request = pool.request();
+
+    request.input("FromDate", sql.Date, from);
+    request.input("ToDate", sql.Date, to);
+
+    const result = await request.query(`
+      SELECT * 
+      FROM dbo.fn_DailyMilkDashboard(@FromDate, @ToDate)
+    `);
+
+    res.json({ Response: result.recordset });
+
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET by transid
+router.get('/:id', async (req, res, next) => {
+  try {
+    await poolConnect;
+    const result = await pool.request()
+      .input('transid', sql.VarChar, req.params.id)
+      .query('SELECT * FROM tbl_dailymilkstatus WHERE transid = @transid;');
+    res.json({ Response: result.recordset });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// CREATE one status row
+router.post('/', async (req, res, next) => {
+  try {
+    const {
+      dailymilkbookingid,
+      date,            // 'YYYY-MM-DD'
+      quantity,
+      cancelled,
+      extra,
+      amount,
+      received,
+      receivedtime,    // datetime string
+      cans_returned,   // NEW (optional)
+      rcu
+    } = req.body;
+
+    if (!dailymilkbookingid || !date || quantity === undefined || amount === undefined || !rcu) {
+      return res.status(400).json({
+        message: "Missing required fields. Please provide dailymilkbookingid, date, quantity, amount and rcu."
+      });
+    }
+
+    if (isNaN(parseFloat(quantity)) || isNaN(parseFloat(amount))) {
+      return res.status(400).json({
+        message: "Quantity and Amount must be valid numbers."
+      });
+    }
+
+    await poolConnect;
+
+    const result = await pool.request()
+      .input('dailymilkbookingid', sql.NVarChar, dailymilkbookingid)
+      .input('date', sql.Date, date)
+      .input('quantity', sql.Decimal(18, 2), quantity)
+      .input('cancelled', cancelled === undefined ? null : cancelled)
+      .input('extra', extra === undefined ? null : sql.Decimal(18, 2), extra)
+      .input('amount', sql.Decimal(18, 2), amount)
+      .input('received', received === undefined ? null : received)
+      .input('receivedtime', receivedtime ? new Date(receivedtime) : null)
+      .input('cans_returned', cans_returned === undefined ? null : sql.Int, cans_returned)
+      .input('rcu', sql.NVarChar, rcu)
+      .query(`
+        INSERT INTO tbl_dailymilkstatus
+          (dailymilkbookingid, [date], quantity, cancelled, extra, amount, received, receivedtime, cans_returned, rcu)
+        OUTPUT INSERTED.*
+        VALUES
+          (@dailymilkbookingid, @date, @quantity, @cancelled, @extra, @amount, @received, @receivedtime, @cans_returned, @rcu);
+      `);
+
+    res.status(201).json(result.recordset);
+
+  } catch (err) {
+    console.error("Error inserting daily milk status:", err);
+    next(err);
+  }
+});
+
+// Bulk cancel dates + apply extra milk
+router.put('/cancel-dates-and-extra-milk', async (req, res, next) => {
+  try {
+    const { transid, dates, extramilk } = req.body;
+
+    if (!transid || typeof transid !== 'string') {
+      return res.status(400).json({ message: 'Missing or invalid transid.' });
+    }
+
+    const datesProvided = Array.isArray(dates) && dates.length > 0;
+    const extraProvided = Array.isArray(extramilk) && extramilk.length > 0;
+
+    if (!datesProvided && !extraProvided) {
+      return res.status(400).json({ message: 'Provide at least one: dates[] or extramilk[].' });
+    }
+
+    let validDates = [];
+    if (datesProvided) {
+      validDates = dates.filter(
+        (d) => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)
+      );
+    }
+
+    let validExtraMilk = [];
+    if (extraProvided) {
+      validExtraMilk = extramilk.filter(
+        (item) =>
+          item &&
+          typeof item.date === 'string' &&
+          /^\d{4}-\d{2}-\d{2}$/.test(item.date) &&
+          item.qty !== undefined &&
+          !isNaN(item.qty)
+      );
+    }
+
+    if ((datesProvided && validDates.length === 0) && (extraProvided && validExtraMilk.length === 0)) {
+      return res.status(400).json({ message: 'No valid dates or extramilk entries found.' });
+    }
+
+    await poolConnect;
+    const transaction = new sql.Transaction(pool);
+    await transaction.begin();
+
+    try {
+      let cancelledCount = 0;
+      let extraUpdatedCount = 0;
+
+      if (validDates.length > 0) {
+        const dateParams = validDates.map((_, i) => `@d${i}`);
+        const dateReq = new sql.Request(transaction);
+        dateReq.input('transid', sql.NVarChar, transid);
+        validDates.forEach((d, i) => dateReq.input(`d${i}`, sql.Date, d));
+
+        const cancelSql = `
+          UPDATE tbl_dailymilkstatus
+          SET cancelled = 1, lum = DATEADD(MINUTE, 330, GETUTCDATE())
+          WHERE dailymilkbookingid = @transid
+            AND [date] IN (${dateParams.join(',')});
+          SELECT @@ROWCOUNT AS affectedRows;
+        `;
+        const cancelRes = await dateReq.query(cancelSql);
+        cancelledCount = cancelRes.recordset?.[0]?.affectedRows || 0;
+
+        const notInReq = new sql.Request(transaction);
+        notInReq.input('transid', sql.NVarChar, transid);
+        validDates.forEach((d, i) => notInReq.input(`nd${i}`, sql.Date, d));
+        const notInParams = validDates.map((_, i) => `@nd${i}`);
+        const unCancelSql = `
+          UPDATE tbl_dailymilkstatus
+          SET cancelled = NULL, lum = DATEADD(MINUTE, 330, GETUTCDATE())
+          WHERE dailymilkbookingid = @transid
+            AND [date] NOT IN (${notInParams.join(',')});
+        `;
+        await notInReq.query(unCancelSql);
+      }
+
+      if (extraProvided) {
+        const clearReq = new sql.Request(transaction);
+        clearReq.input('transid', sql.NVarChar, transid);
+        await clearReq.query(`
+          UPDATE tbl_dailymilkstatus
+          SET extra = NULL, lum = DATEADD(MINUTE, 330, GETUTCDATE())
+          WHERE dailymilkbookingid = @transid;
+        `);
+
+        for (const item of validExtraMilk) {
+          const extraReq = new sql.Request(transaction);
+          extraReq.input('transid', sql.NVarChar, transid);
+          extraReq.input('date', sql.Date, item.date);
+          extraReq.input('qty', sql.Decimal(10, 2), Number(item.qty));
+          const resUpd = await extraReq.query(`
+            UPDATE tbl_dailymilkstatus
+            SET extra = @qty, lum = DATEADD(MINUTE, 330, GETUTCDATE())
+            WHERE dailymilkbookingid = @transid AND [date] = @date;
+            SELECT @@ROWCOUNT AS affectedRows;
+          `);
+          extraUpdatedCount += resUpd.recordset?.[0]?.affectedRows || 0;
+        }
+      }
+
+      await transaction.commit();
+
+      const parts = [];
+      if (validDates.length > 0) parts.push(`${cancelledCount} date(s) cancelled`);
+      if (extraProvided) parts.push(`${extraUpdatedCount} extra milk update(s)`);
+      res.json({ message: `Success: ${parts.join(' and ')}.` });
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
+  } catch (err) {
+    console.error('Error in cancel-dates-and-extra-milk:', err);
+    next(err);
+  }
+});
+
+// UPDATE one status row
+router.put('/', async (req, res, next) => {
+  try {
+    await poolConnect;
+
+    const id = req.body.transid;
+    if (!id) return res.status(400).json({ message: 'transid is required.' });
+
+    const allowedFields = [
+      'dailymilkbookingid',
+      'date',
+      'quantity',
+      'cancelled',
+      'extra',
+      'amount',
+      'received',
+      'receivedtime',   // will be overridden if 'received' present
+      'cans_returned',  // NEW
+      'luu'
+    ];
+
+    const updates = [];
+    const request = pool.request();
+    request.input('transid', sql.NVarChar, id);
+
+    allowedFields.forEach((f) => {
+      if (req.body[f] !== undefined) {
+        if (f === 'quantity' || f === 'extra' || f === 'amount') {
+          request.input(f, sql.Decimal(18, 2), req.body[f]);
+          updates.push(`${f} = @${f}`);
+        } else if (f === 'cancelled' || f === 'received') {
+          request.input(f, sql.Int, req.body[f]);
+          updates.push(`${f} = @${f}`);
+        } else if (f === 'cans_returned') {
+          request.input(f, sql.Int, req.body[f]);
+          updates.push(`${f} = @${f}`);
+        } else if (f === 'date') {
+          request.input(f, sql.Date, req.body[f]);
+          updates.push(`${f} = @${f}`);
+        } else if (f === 'receivedtime') {
+          request.input(f, sql.DateTime2, req.body[f]);
+          updates.push(`${f} = @${f}`);
+        } else if (f === 'luu' || f === 'dailymilkbookingid') {
+          request.input(f, sql.NVarChar, req.body[f]);
+          updates.push(`${f} = @${f}`);
+        }
+      }
+    });
+
+    // If 'received' is present, set 'receivedtime' to IST "now"
+    if (req.body.received !== undefined) {
+      const idx = updates.findIndex(s => s.startsWith('receivedtime ='));
+      if (idx !== -1) updates.splice(idx, 1);
+      updates.push(`receivedtime = CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'India Standard Time' AS datetime2)`);
+    }
+
+    // Always bump LUM to IST "now"
+    updates.push(`lum = CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'India Standard Time' AS datetime2)`);
+
+    if (updates.length === 0) {
+      return res.status(400).json({ message: 'No valid fields provided to update.' });
+    }
+
+    const setClause = updates.join(', ');
+
+    const result = await request.query(`
+      UPDATE tbl_dailymilkstatus
+      SET ${setClause}
+      WHERE transid = @transid;
+
+      SELECT @@ROWCOUNT AS affected;
+    `);
+
+   
+
+    if (!result.recordset?.[0]?.affected) {
+      return res.status(404).json({
+        message: 'Daily milk status record not found with the provided transid.'
+      });
+    }
+
+    res.json({ message: 'Daily milk status updated successfully.' });
+  } catch (err) {
+    console.error('Error updating daily milk status:', err);
+    next(err);
+  }
+});
+
+// DELETE by transid (fixed from bookingid)
+router.delete('/', async (req, res, next) => {
+  try {
+    const id = req.body.bookingid;
+    await poolConnect;
+    const result = await pool.request()
+      .input('bookingid', sql.VarChar, id)
+      .query(`
+        DELETE FROM tbl_dailymilkstatus
+        WHERE bookingid = @bookingid;
+        SELECT @@ROWCOUNT AS affected;
+      `);
+    if (result.recordset[0].affected === 0) {
+      return res.status(404).json({ message: 'Not found' });
+    }
+    res.json({ message: 'Deleted successfully' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+module.exports = router;
